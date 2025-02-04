@@ -1,20 +1,59 @@
 package org.projetoredes.models;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
+import java.io.IOException;
+import java.net.*;
 
-@Getter
-@Setter
+@Data // getter, setter, hashcode e equals
 public class Server {
+    private static ServerSocket serverSocket;
+    private static SocketAddress serverAddress;
     private static InetAddress host;
     private static int port;
+    private static int connQueueSize;
 
 
-    public Server(String host, int port) throws UnknownHostException {
-        Server.host = InetAddress.getByName(host);
+    private static void run(){}
+
+
+
+    public void startServer() throws IOException {
+        if(Server.serverAddress == null){
+            // TODO - Criar excessao propria
+            throw new RuntimeException("Erro ao iniciar servidor: nenhum endpoint especificado.");
+        }
+
+        serverSocket = new ServerSocket(Server.port, Server.connQueueSize, Server.host);
+
+        Server.run();
+    }
+
+    public void startServer(String host, int port, int connQueueSize) throws IOException {
+        try {
+            Server.host = InetAddress.getByName(host);
+        }catch (UnknownHostException error){
+            // TODO - criar gerenciamento de excessoes
+            throw new RuntimeException("Error in server setup: " + error.getMessage());
+        }
         Server.port = port;
+        Server.connQueueSize = connQueueSize;
+        Server.serverAddress = new InetSocketAddress(host, port);
+        serverSocket = new ServerSocket(Server.port, Server.connQueueSize, Server.host);
+
+        Server.run();
+    }
+
+    public void serverSetup(String host, int port, int connQueueSize) throws IOException {
+        try {
+            Server.host = InetAddress.getByName(host);
+        }catch (UnknownHostException error){
+            // TODO - criar gerenciamento de excessoes
+            throw new RuntimeException("Error in server setup: " + error.getMessage());
+        }
+        Server.port = port;
+        Server.connQueueSize = connQueueSize;
+        Server.serverAddress = new InetSocketAddress(Server.host, Server.port);
+        Server.serverSocket = new ServerSocket(Server.port, Server.connQueueSize, Server.host);
     }
 }

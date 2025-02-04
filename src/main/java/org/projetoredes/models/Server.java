@@ -4,6 +4,7 @@ import lombok.Data;
 
 import java.io.IOException;
 import java.net.*;
+import java.util.Scanner;
 
 @Data // getter, setter, hashcode e equals
 public class Server {
@@ -14,7 +15,13 @@ public class Server {
     private static int connQueueSize;
 
 
-    private static void run(){}
+    private static void run() throws IOException {
+        Scanner keyboard = new Scanner(System.in);
+        while(!keyboard.nextLine().equals("exit")){
+            serverSocket.accept();
+        }
+        serverSocket.close();
+    }
 
 
 
@@ -24,7 +31,7 @@ public class Server {
             throw new RuntimeException("Erro ao iniciar servidor: nenhum endpoint especificado.");
         }
 
-        serverSocket = new ServerSocket(Server.port, Server.connQueueSize, Server.host);
+        Server.serverSocket = new ServerSocket(Server.port, Server.connQueueSize, Server.host);
 
         Server.run();
     }
@@ -39,7 +46,7 @@ public class Server {
         Server.port = port;
         Server.connQueueSize = connQueueSize;
         Server.serverAddress = new InetSocketAddress(host, port);
-        serverSocket = new ServerSocket(Server.port, Server.connQueueSize, Server.host);
+        Server.serverSocket = new ServerSocket(Server.port, Server.connQueueSize, Server.host);
 
         Server.run();
     }

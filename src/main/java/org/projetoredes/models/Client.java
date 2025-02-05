@@ -4,6 +4,7 @@ import com.projetoredes.abstractions.ClientSocket;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.InetAddress;
 import java.net.SocketAddress;
 
 public class Client implements ClientSocket {
@@ -14,8 +15,10 @@ public class Client implements ClientSocket {
 
     
     @Override
-    public void connectServer() {
-
+    public void connectServer(String host, int port) {
+        InetAddress address = InetAddress.getByName(host); //Determines the IP address of a host, given the host's name.
+        
+        
     }
 
     @Override

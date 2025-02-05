@@ -12,10 +12,11 @@ public class Client implements ClientSocket {
     private OutputStream dataOutput;
 
 
+    
+    @Override
+    public void connectServer() {
 
-
-
-
+    }
 
     @Override
     public void getProcessorsQuantity() {

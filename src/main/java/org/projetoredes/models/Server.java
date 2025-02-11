@@ -1,12 +1,14 @@
 package org.projetoredes.models;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.IOException;
 import java.net.*;
 import java.util.Scanner;
 
-@Data // getter, setter, hashcode e equals
+@Getter
+@Setter
 public class Server {
     private ServerSocket serverSocket;
     private SocketAddress serverAddress;
@@ -15,30 +17,33 @@ public class Server {
     private int connQueueSize;
 
 
-    private void run() throws IOException {
+    public void startServer() throws IOException {
         Scanner keyboard = new Scanner(System.in);
         while(!keyboard.nextLine().equals("exit")){
-            serverSocket.accept();
+            Socket client = serverSocket.accept();
 
-            Thread.
+            // Cria uma Thread para o cliente
+            new ConnectionHandler(client).start();
         }
+
         serverSocket.close();
     }
 
-
-
-    public void startServer(String host, int port, int connQueueSize) throws IOException {
-        try {
+    public Server(String host, int port, int connQueueSize){
+        try{
             this.host = InetAddress.getByName(host);
         }catch (UnknownHostException error){
-            // TODO - criar gerenciamento de excessoes
-            throw new RuntimeException("Error in server setup: " + error.getMessage());
+            throw new RuntimeException("Host inválido: " + error);
         }
+
         this.port = port;
         this.connQueueSize = connQueueSize;
         this.serverAddress = new InetSocketAddress(host, port);
-        this.serverSocket = new ServerSocket(this.port, this.connQueueSize, this.host);
 
-        run();
+        try{
+            this.serverSocket = new ServerSocket(this.port, this.connQueueSize, this.host);
+        } catch (IOException e) {
+            throw new RuntimeException("Erro ao criar o socket do servidor: " + e);
+        }
     }
 }

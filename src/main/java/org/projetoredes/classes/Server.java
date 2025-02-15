@@ -1,4 +1,4 @@
-package org.projetoredes.models;
+package org.projetoredes.classes;
 
 import lombok.Getter;
 import lombok.Setter;

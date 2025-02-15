@@ -1,6 +1,6 @@
 package org.projetoredes;
 
-import org.projetoredes.models.Client;
+import org.projetoredes.classes.Client;
 
 public class RunClient {
     public static void main(String[] args) {

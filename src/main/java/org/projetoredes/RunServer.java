@@ -1,6 +1,6 @@
 package org.projetoredes;
 
-import org.projetoredes.models.Server;
+import org.projetoredes.classes.Server;
 
 import java.io.IOException;
 

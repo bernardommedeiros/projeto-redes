@@ -17,7 +17,17 @@ public class Client implements ClientSocket {
     @Override
     public void connectServer(String host, int port) {
         InetAddress address = InetAddress.getByName(host); //Determines the IP address of a host, given the host's name.
-        
+
+        Socket socketClient = new Socket(address, port);
+
+        InputStream input = socketClient.getInputStream();
+        byte[] reader = new byte[128]; 
+
+        //le a qtd de dados recebidos
+        int inputRead = input.read(reader);
+        System.out.println(reader.toString());
+
+        InputStream output = socketClient.getInputStream();
         
     }
 

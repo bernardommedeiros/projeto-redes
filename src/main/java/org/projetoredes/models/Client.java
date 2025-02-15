@@ -1,6 +1,6 @@
 package org.projetoredes.models;
 
-import com.projetoredes.abstractions.ClientSocket;
+import org.projetoredes.abstractions.ClientSocket;
 
 import java.io.InputStream;
 import java.io.OutputStream;

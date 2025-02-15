@@ -24,9 +24,9 @@ public class ConnectionHandler extends Thread{
                 byte[] msg = ("Digite um comando:").getBytes(StandardCharsets.UTF_8);
                 clientOS.write(msg);
 
-                byte[] received = new byte[128];
+                byte[] received = new byte[16];
                 int bytesRead = clientIS.read(received);
-                System.out.println(bytesRead + " bytes lidos: " + Arrays.toString(received));
+                System.out.println(bytesRead + " bytes lidos: " + bytesRead + " - " + new String(received, StandardCharsets.UTF_8));
 
             }catch (IOException e){
                 throw new RuntimeException("Error with client IO stream: ", e);

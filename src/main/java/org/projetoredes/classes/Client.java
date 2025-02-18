@@ -14,7 +14,7 @@ import java.util.Scanner;
 public class Client implements ClientSocket {
     private Socket clientSocket;
     private InetAddress host;
-    private Integer port;
+    private int port;
 
 
     private void run(){
@@ -58,26 +58,6 @@ public class Client implements ClientSocket {
             throw new RuntimeException("Erro ao conectar no servidor: ", e);
         }
 
-
-    }
-
-    @Override
-    public void getProcessorsQuantity() {
-
-    }
-
-    @Override
-    public void getFreeRam() {
-
-    }
-
-    @Override
-    public void getFreeDisk() {
-
-    }
-
-    @Override
-    public void getProcessorTemperature() {
 
     }
 }

@@ -21,6 +21,12 @@
             <artifactId>postgresql</artifactId>
             <version>42.7.5</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.github.oshi</groupId>
+            <artifactId>oshi-core</artifactId>
+            <version>6.6.6</version>
+        </dependency>
     </dependencies>
 
 

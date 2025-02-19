@@ -2,6 +2,7 @@ package org.projetoredes.classes;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.projetoredes.util.Encryptor;
 import oshi.SystemInfo;
 import oshi.hardware.CentralProcessor;
 import oshi.hardware.HardwareAbstractionLayer;
@@ -28,17 +29,23 @@ public class ConnectionHandler extends Thread {
         ) {
             while (clientSocket.isConnected()) {
                 // define a mensagem a ser enviada
-                byte[] msg = ("Digite um comando:").getBytes(StandardCharsets.UTF_8);
+                byte[] msg = Encryptor.encrypt("Teste");
                 // envia a mensagem
                 clientOS.write(msg);
                 // limpa o buffer, obriga o cliente a processar o dado
                 clientOS.flush();
 
-                byte[] received = new byte[16]; // buffer pra armazenar a informaçao que veio do cliente
+                byte[] received = new byte[256]; // buffer pra armazenar a informaçao que veio do cliente
 
                 int bytesRead = clientIS.read(received); // bytesRead = qtd de bytes lidos, received <- informaçao
+<<<<<<< HEAD
                 String commandReceived = new String(received, 0, bytesRead, StandardCharsets.UTF_8);
                 System.out.println(bytesRead + " bytes lidos: " + " - " + commandReceived);
+=======
+                byte[] decryptedMsg = Encryptor.decrypt(received);
+                String commandReceived = new String(decryptedMsg, 0, bytesRead, StandardCharsets.UTF_8);
+                System.out.println(bytesRead + " bytes lidos: " + bytesRead + " - " + commandReceived);
+>>>>>>> 1f578c2 (inicio da criptografia)
             }
         } catch (IOException e) {
             throw new RuntimeException("Erro na comunicacao com o cliente: ", e);

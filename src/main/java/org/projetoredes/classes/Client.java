@@ -1,6 +1,7 @@
 package org.projetoredes.classes;
 
 import org.projetoredes.abstractions.ClientCommandsHandler;
+import org.projetoredes.util.Encryptor;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,20 +25,21 @@ public class Client extends ClientCommandsHandler {
             Scanner cmdInput = new Scanner(System.in);
 
             while(true){
-                byte[] reader = new byte[32]; // 32 = quantidade de bytes a ser recebida a cada processamento
+                byte[] reader = new byte[256]; // 32 = quantidade de bytes a ser recebida a cada processamento
 
                 // le a qtd de dados recebidos
                 int inputRead = input.read(reader); // inputRead = qtd de bytes lidos ; reader <- bytes vindo do servidor (informaçao em si)
 
                 // Loop para ler toda a informaçao, -1 significa que nao tem mais nada no buffer do InputStream (nao tem mais informaçao a ser lida)
                 if(inputRead != -1){
-                    System.out.println(new String(reader, 0, inputRead, StandardCharsets.UTF_8));
+                    byte[] decryptedMsg = Encryptor.decrypt(reader);
+                    System.out.println(new String(decryptedMsg, 0, inputRead, StandardCharsets.UTF_8));
                 }
 
                 // Enviar comandos para o servidor
                 // TODO - Verificar se o comando e valido antes de enviar
                 // TODO - Receber comandos e enviar dados pro servidor
-                byte[] cmdInputBytes = cmdInput.nextLine().getBytes(StandardCharsets.UTF_8); // String para byte[] em UTF_8
+                byte[] cmdInputBytes = Encryptor.encrypt(cmdInput.nextLine());
                 output.write(cmdInputBytes); // envia a informaçao para o servidor
             }
         }catch (IOException e){

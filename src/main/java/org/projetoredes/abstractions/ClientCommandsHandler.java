@@ -4,25 +4,32 @@ import oshi.SystemInfo;
 import oshi.hardware.CentralProcessor;
 import oshi.hardware.HardwareAbstractionLayer;
 import oshi.software.os.OSFileStore;
+import org.projetoredes.enums.Commands;
 
 import java.util.List;
 
 public abstract class ClientCommandsHandler implements ClientSocket {
-    private String manageCommands(String command){
-        switch(command){
-            case "processor":
+    
+    public String manageCommands(String command) {
+        Commands commandEnum = Commands.fromString(command);
+        
+        if (commandEnum == null) {
+            return "Command not found";
+        }
+        
+        switch (commandEnum) {
+            case Processor:
                 return String.valueOf(getProcessorsQuantity());
-            case "freeram":
+            case FreeRam:
                 return String.format("%.1f", getFreeRam());
-            case "freedisk":
+            case FreeDisk:
                 return String.valueOf(getFreeDisk());
-            case "processortemp":
+            case ProcessorTemp:
                 return String.valueOf(getProcessorTemperature());
             default:
                 return "Command not found";
         }
     }
-
 
     @Override
     public int getProcessorsQuantity() {
@@ -42,15 +49,13 @@ public abstract class ClientCommandsHandler implements ClientSocket {
     @Override
     public double getFreeDisk() {
         SystemInfo si = new SystemInfo();
-
         List<OSFileStore> fileSystem = si.getOperatingSystem().getFileSystem().getFileStores();
         long freeDiskBytes = 0;
-        for(OSFileStore store : fileSystem){
-            if(store.getMount().charAt(0) == 'C' || store.getMount().charAt(0) == '/'){
+        for (OSFileStore store : fileSystem) {
+            if (store.getMount().charAt(0) == 'C' || store.getMount().charAt(0) == '/') {
                 freeDiskBytes += store.getUsableSpace();
             }
         }
-
         return (freeDiskBytes / 1073741824.0);
     }
 

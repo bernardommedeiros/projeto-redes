@@ -38,14 +38,10 @@ public class ConnectionHandler extends Thread {
                 byte[] received = new byte[256]; // buffer pra armazenar a informaçao que veio do cliente
 
                 int bytesRead = clientIS.read(received); // bytesRead = qtd de bytes lidos, received <- informaçao
-<<<<<<< HEAD
-                String commandReceived = new String(received, 0, bytesRead, StandardCharsets.UTF_8);
-                System.out.println(bytesRead + " bytes lidos: " + " - " + commandReceived);
-=======
+
                 byte[] decryptedMsg = Encryptor.decrypt(received);
                 String commandReceived = new String(decryptedMsg, 0, bytesRead, StandardCharsets.UTF_8);
                 System.out.println(bytesRead + " bytes lidos: " + bytesRead + " - " + commandReceived);
->>>>>>> 1f578c2 (inicio da criptografia)
             }
         } catch (IOException e) {
             throw new RuntimeException("Erro na comunicacao com o cliente: ", e);

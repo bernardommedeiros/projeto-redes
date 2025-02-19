@@ -7,5 +7,6 @@ public class RunClient {
         Client client = new Client();
 
         client.connectServer("localhost", 6000);
+
     }
 }

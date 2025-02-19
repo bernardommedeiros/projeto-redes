@@ -5,6 +5,8 @@ import lombok.Setter;
 
 import java.io.IOException;
 import java.net.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 @Getter
@@ -15,6 +17,7 @@ public class Server {
     private int port;                    // porta do servidor
     private int connQueueSize;           // Quantos clientes podem ter
 
+    private List<Socket> clientSockets = new ArrayList<>();
 
     public void startServer() throws IOException {
         Scanner keyboard = new Scanner(System.in);
@@ -25,6 +28,10 @@ public class Server {
 
             // Cria uma Thread para o cliente
             new ConnectionHandler(client).start();
+
+            clientSockets.add(client);
+
+            System.out.println("clientes" + clientSockets);
         }
 
         serverSocket.close();

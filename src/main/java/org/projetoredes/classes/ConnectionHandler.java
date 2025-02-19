@@ -38,7 +38,7 @@ public class ConnectionHandler extends Thread {
 
                 int bytesRead = clientIS.read(received); // bytesRead = qtd de bytes lidos, received <- informaçao
                 String commandReceived = new String(received, 0, bytesRead, StandardCharsets.UTF_8);
-                System.out.println(bytesRead + " bytes lidos: " + bytesRead + " - " + commandReceived);
+                System.out.println(bytesRead + " bytes lidos: " + " - " + commandReceived);
             }
         } catch (IOException e) {
             throw new RuntimeException("Erro na comunicacao com o cliente: ", e);

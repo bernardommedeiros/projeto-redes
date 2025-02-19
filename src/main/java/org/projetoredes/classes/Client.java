@@ -57,7 +57,6 @@ public class Client extends ClientCommandsHandler {
 
         try{
              this.clientSocket = new Socket(host, port);
-
              this.run();
         }catch (IOException e){
             throw new RuntimeException("Erro ao conectar no servidor: ", e);

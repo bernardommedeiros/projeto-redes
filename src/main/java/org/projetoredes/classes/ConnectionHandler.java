@@ -51,7 +51,7 @@ public class ConnectionHandler extends Thread {
             clientOS.flush();
 
             // recebimento da resposta
-            byte[] response = new byte[256];
+            byte[] response = new byte[32];
             int bytesRead = clientIS.read(response);
 
             if(bytesRead > 0){

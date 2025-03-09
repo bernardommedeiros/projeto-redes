@@ -2,31 +2,35 @@ package org.projetoredes.util;
 
 import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
-import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 
 public class Encryptor {
-    // Algoritmo AES
-    // modo de operaçao ECB que funciona em blocos
-    // preenchimento PKCS5Padding
-    private static final String TRANSFORMATION = "AES/ECB/PKCS5Padding";
-    // Chave AES de 256 bits
-    private static final String KEY = "wi0yA3A6pBt0y6uS9LnwGxRqF2bsPNLBhz2qgVzxNlY=";
-
-
-    private static SecretKey getKey(){
-        byte[] decodedKey = Base64.getDecoder().decode(Encryptor.KEY);
-        return new SecretKeySpec(decodedKey, "AES");
+    public static SecretKey genKey(){
+        try{
+            KeyGenerator keyGen = KeyGenerator.getInstance("AES");
+            keyGen.init(256);
+            return keyGen.generateKey();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public static byte[] encrypt(String msg){
-        try{
-            Cipher cipher = Cipher.getInstance(Encryptor.TRANSFORMATION);
-            cipher.init(Cipher.ENCRYPT_MODE, Encryptor.getKey());
-            return cipher.doFinal(msg.getBytes(StandardCharsets.UTF_8));
+    public static byte[] prepareKey(SecretKey key){
+        byte[] encoded = Base64.getEncoder().encode(key.getEncoded());
+        return Base64.getDecoder().decode(encoded);
+    }
 
+    public static SecretKey resolveKey(byte[] key){
+        return new SecretKeySpec(key, "AES");
+    }
+
+    public static byte[] encrypt(String msg, SecretKey key){
+        try{
+            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+            cipher.init(Cipher.ENCRYPT_MODE, key);
+            return cipher.doFinal(msg.getBytes());
         }catch (NoSuchAlgorithmException | NoSuchPaddingException e){
             throw new RuntimeException("Erro ao encriptar mensagem: ", e);
         } catch (InvalidKeyException e) {
@@ -37,12 +41,11 @@ public class Encryptor {
     }
 
 
-    public static byte[] decrypt(byte[] msg){
+    public static String decrypt(byte[] msg, SecretKey key){
         try{
-            Cipher cipher = Cipher.getInstance(Encryptor.TRANSFORMATION);
-            cipher.init(Cipher.DECRYPT_MODE, Encryptor.getKey());
-            return cipher.doFinal(msg);
-
+            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+            cipher.init(Cipher.DECRYPT_MODE, key);
+            return new String(cipher.doFinal(msg));
         }catch (NoSuchAlgorithmException | NoSuchPaddingException e){
             throw new RuntimeException("Erro ao encriptar mensagem: ", e);
         } catch (InvalidKeyException e) {

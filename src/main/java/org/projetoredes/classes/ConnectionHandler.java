@@ -1,50 +1,83 @@
 package org.projetoredes.classes;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.projetoredes.util.Encryptor;
-import oshi.SystemInfo;
-import oshi.hardware.CentralProcessor;
-import oshi.hardware.HardwareAbstractionLayer;
-import oshi.software.os.OSFileStore;
 
+import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
+import java.util.Arrays;
 
 // Essa classe representa a thread que sera feita para cada cliente conectado
 
 @Getter
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ConnectionHandler extends Thread {
-    Socket clientSocket;
+    private final Socket clientSocket;
+    private SecretKey key;
+    private InputStream clientIS;
+    private OutputStream clientOS;
 
     @Override
     public void run() {
-        try (InputStream clientIS = clientSocket.getInputStream();   // Entrada de dados vindo do cliente
-             OutputStream clientOS = clientSocket.getOutputStream(); // Envio de dados para o cliente
-        ) {
-            while (clientSocket.isConnected()) {
-                // define a mensagem a ser enviada
-                byte[] msg = Encryptor.encrypt("Teste");
-                // envia a mensagem
-                clientOS.write(msg);
-                // limpa o buffer, obriga o cliente a processar o dado
-                clientOS.flush();
+        try {
+            this.clientIS = clientSocket.getInputStream();   // Entrada de dados vindo do cliente
+            this.clientOS = clientSocket.getOutputStream(); // Envio de dados para o cliente
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
-                byte[] received = new byte[256]; // buffer pra armazenar a informaçao que veio do cliente
+        try {
+            this.key = Encryptor.genKey();
+            clientOS.write(Encryptor.prepareKey(key));
+            clientOS.flush();
+        } catch (IOException e) {
+            throw new RuntimeException("Erro ao enviar chave para cliente: ", e);
+        }
+    }
 
-                int bytesRead = clientIS.read(received); // bytesRead = qtd de bytes lidos, received <- informaçao
 
-                byte[] decryptedMsg = Encryptor.decrypt(received);
-                String commandReceived = new String(decryptedMsg, 0, bytesRead, StandardCharsets.UTF_8);
-                System.out.println(bytesRead + " bytes lidos: " + bytesRead + " - " + commandReceived);
+    public void sendCommand(String command){
+        // define a mensagem a ser enviada
+        byte[] commandBytes = Encryptor.encrypt(command, key);
+
+        try {
+            // envia a mensagem
+            clientOS.write(commandBytes);
+            // limpa o buffer, obriga o cliente a processar o dado
+            clientOS.flush();
+
+            // recebimento da resposta
+            byte[] response = new byte[256];
+            int bytesRead = clientIS.read(response);
+
+            if(bytesRead > 0){
+                // Descriptografia da resposta
+                byte[] data = Arrays.copyOfRange(response, 0, bytesRead);
+                String decryptedResponse = Encryptor.decrypt(data, key);
+
+                System.out.println(decryptedResponse);
             }
         } catch (IOException e) {
-            throw new RuntimeException("Erro na comunicacao com o cliente: ", e);
+            throw new RuntimeException("Erro ao enviar comando pro cliente: " + e);
+        }
+    }
+
+
+    public boolean checkConnection(){
+        byte[] commandBytes = Encryptor.encrypt("connectiontest", key);
+
+        try {
+            clientOS.write(commandBytes);
+            clientOS.flush();
+
+            int bytesRead = clientIS.read();
+            return bytesRead > 0;
+        } catch (IOException e) {
+            throw new RuntimeException("Erro ao enviar checagem de conexao pro cliente: " + e);
         }
     }
 }

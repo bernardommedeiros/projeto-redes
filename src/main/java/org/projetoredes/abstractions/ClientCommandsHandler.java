@@ -7,19 +7,23 @@ import oshi.software.os.OSFileStore;
 
 import java.util.List;
 
-public abstract class ClientCommandsHandler implements ClientSocket {
-    private String manageCommands(String command){
+public abstract class ClientCommandsHandler implements ClientCommands {
+    protected String manageCommands(String command){
         switch(command){
+            case "connectiontest":
+                return "connected";
             case "processor":
                 return String.valueOf(getProcessorsQuantity());
             case "freeram":
-                return String.format("%.1f", getFreeRam());
+                return String.format("%.1f", getFreeRam()) + " GB";
             case "freedisk":
-                return String.valueOf(getFreeDisk());
-            case "processortemp":
-                return String.valueOf(getProcessorTemperature());
+                return String.format("%.0f", getFreeDisk()) + " GB";
+            case "temp":
+                return getProcessorTemperature() + " °C";
+            case "media":
+                return String.format("%.2f", getMedia());
             default:
-                return "Command not found";
+                return "Comando invalido.";
         }
     }
 
@@ -58,5 +62,10 @@ public abstract class ClientCommandsHandler implements ClientSocket {
     public double getProcessorTemperature() {
         SystemInfo si = new SystemInfo();
         return si.getHardware().getSensors().getCpuTemperature();
+    }
+
+    @Override
+    public double getMedia(){
+        return (getProcessorsQuantity() + getFreeRam() + getFreeDisk() + getProcessorTemperature()) / 4;
     }
 }

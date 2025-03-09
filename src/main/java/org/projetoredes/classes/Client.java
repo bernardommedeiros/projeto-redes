@@ -3,47 +3,55 @@ package org.projetoredes.classes;
 import org.projetoredes.abstractions.ClientCommandsHandler;
 import org.projetoredes.util.Encryptor;
 
+import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.nio.charset.StandardCharsets;
-import java.util.Scanner;
+import java.util.Arrays;
 
 public class Client extends ClientCommandsHandler {
     private Socket clientSocket;
     private InetAddress host;
     private int port;
+    private SecretKey key;
 
 
     private void run(){
         try{
             InputStream input = clientSocket.getInputStream();    // Entrada de dados vindo do servidor
             OutputStream output = clientSocket.getOutputStream(); // Saida de dados para o servidor
-            Scanner cmdInput = new Scanner(System.in);
 
+            this.receiveKey(input);
             while(true){
                 byte[] reader = new byte[256]; // 32 = quantidade de bytes a ser recebida a cada processamento
 
                 // le a qtd de dados recebidos
                 int inputRead = input.read(reader); // inputRead = qtd de bytes lidos ; reader <- bytes vindo do servidor (informaçao em si)
+                byte[] data = Arrays.copyOfRange(reader, 0, inputRead);
+                String decryptedMsg = Encryptor.decrypt(data, key);
 
-                // Loop para ler toda a informaçao, -1 significa que nao tem mais nada no buffer do InputStream (nao tem mais informaçao a ser lida)
-                if(inputRead != -1){
-                    byte[] decryptedMsg = Encryptor.decrypt(reader);
-                    System.out.println(new String(decryptedMsg, 0, inputRead, StandardCharsets.UTF_8));
-                }
-
-                // Enviar comandos para o servidor
-                // TODO - Verificar se o comando e valido antes de enviar
-                // TODO - Receber comandos e enviar dados pro servidor
-                byte[] cmdInputBytes = Encryptor.encrypt(cmdInput.nextLine());
-                output.write(cmdInputBytes); // envia a informaçao para o servidor
+                // envio da resposta
+                String commandResult = manageCommands(decryptedMsg);
+                byte[] commandResultBytes = Encryptor.encrypt(commandResult, key);
+                output.write(commandResultBytes);
+                output.flush();
             }
         }catch (IOException e){
             throw new RuntimeException("Erro ao conectar no servidor: ", e);
+        }
+    }
+
+    private void receiveKey(InputStream clientIS){
+        byte[] buffer = new byte[32];
+
+        try{
+            clientIS.read(buffer);
+            this.key = Encryptor.resolveKey(buffer);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 

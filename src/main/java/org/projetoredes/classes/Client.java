@@ -26,7 +26,7 @@ public class Client extends ClientCommandsHandler {
 
             this.receiveKey(input);
             while(true){
-                byte[] reader = new byte[256]; // 32 = quantidade de bytes a ser recebida a cada processamento
+                byte[] reader = new byte[32]; // 32 = quantidade de bytes a ser recebida a cada processamento
 
                 // le a qtd de dados recebidos
                 int inputRead = input.read(reader); // inputRead = qtd de bytes lidos ; reader <- bytes vindo do servidor (informaçao em si)
